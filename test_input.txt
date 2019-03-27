@@ -1,0 +1,3 @@
+settings initial_stack 1000
+settings transaction_fee_percent 0.2
+action order 2000
