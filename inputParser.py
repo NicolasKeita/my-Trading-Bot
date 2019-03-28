@@ -1,10 +1,12 @@
 from sys import stderr
 
+from candle import Candle
+
 
 class InputParser:
-    def __init__(self, settings, candles):
+    def __init__(self, settings, candles_list):
         self.settings = settings
-        self.candles = candles
+        self.candles_list = candles_list
 
     def do_infinite_input_parsing(self):
         i = 0
@@ -26,15 +28,12 @@ class InputParser:
                     print("pass")
                 else:
                     candle = self.select_last_candle("USDT_ETH")
-                    print(candle.close, file=stderr)
-                    action_USDT_ETH = candle.close
-                    amount_i_want_to_sell = (self.settings.USDT_stockpile / 2) / action_USDT_ETH
+                    amount_i_want_to_sell = (self.settings.USDT_stockpile / 2) / candle.close
                     print("buy USDT_ETH", amount_i_want_to_sell)
-                    self.settings.ETH_stockpile += InputParser.percent(amount_i_want_to_sell, self.settings.transaction_fee_percent)
-                    self.settings.USDT_stockpile -= self.settings.USDT_stockpile / 2
 
     def select_last_candle(self, pair):
-        for candle in self.candles:
+        candles = self.candles_list[-1]
+        for candle in candles:
             if candle.pair == pair:
                 return candle
 
@@ -42,12 +41,26 @@ class InputParser:
         if player == "game":
             if update_type == "next_candles":
                 self.parse_candles_value(value)
+            elif update_type == "stacks":
+                self.parse_new_stacks(value)
+
+    def parse_new_stacks(self, value):
+        stacks = value.split(',')
+        for stack in stacks:
+            parts = stack.split(':')
+            if parts[0] == "BTC":
+                self.settings.BTC_stockpile = float(parts[1])
+            elif parts[0] == "ETH":
+                self.settings.ETH_stockpile = float(parts[1])
+            elif parts[0] == "USDT":
+                self.settings.USDT_stockpile = float(parts[1])
 
     def parse_candles_value(self, value):
+        three_candles = [Candle("USDT_ETH"), Candle("USDT_BTC"), Candle("BTC_ETH")]
         candles_input = value.split(';')
         for candle_input in candles_input:
             candle_part = candle_input.split(',')
-            for candle in self.candles:
+            for candle in three_candles:
                 if candle.pair == candle_part[0]:
                     candle.date = float(candle_part[1])
                     candle.high = float(candle_part[2])
@@ -55,6 +68,9 @@ class InputParser:
                     candle.open = float(candle_part[4])
                     candle.close = float(candle_part[5])
                     candle.volume = float(candle_part[6])
+        self.candles_list.append(three_candles)
+        if len(self.candles_list) > 20:
+            self.candles_list.pop(0)
 
     def set_setting(self, setting_type, value):
         if setting_type == "initial_stack":
