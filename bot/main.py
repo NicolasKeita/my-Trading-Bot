@@ -1,14 +1,12 @@
 #!/usr/bin/python3
 
-from inputParser import InputParser
-from settings import Settings
-from candle import Candle
+from bot.inputParser import InputParser
+from bot.settings import Settings
 
 
 def main():
     settings = Settings()
     candles_list = []
-    #candles_list = [[Candle("USDT_ETH"), Candle("USDT_BTC"), Candle("BTC_ETH")]]
     p = InputParser(settings, candles_list)
 
     p.do_infinite_input_parsing()

@@ -1,6 +1,5 @@
 from sys import stderr
-
-from candle import Candle
+from bot.candle import Candle
 
 
 class InputParser:
@@ -15,6 +14,7 @@ class InputParser:
                 line = input()
             except EOFError:
                 break
+
             if line.endswith('\n'):
                 line = line[:-1]
             parts = line.split(" ")
@@ -27,6 +27,9 @@ class InputParser:
                 if i >= 10:
                     print("pass")
                 else:
+                    if len(self.candles_list) == 0:
+                        print("pass")
+                        continue
                     candle = self.select_last_candle("USDT_ETH")
                     amount_i_want_to_sell = (self.settings.USDT_stockpile / 2) / candle.close
                     print("buy USDT_ETH", amount_i_want_to_sell)
