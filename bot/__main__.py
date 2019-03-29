@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 
-from bot.inputParser import InputParser
-from bot.settings import Settings
+from inputParser import InputParser
+from settings import Settings
 
 
 def main():
@@ -14,3 +14,5 @@ def main():
 
 if __name__ == "__main__":
     main()
+else:
+    raise ImportError("Run this file directly, don't import it!")

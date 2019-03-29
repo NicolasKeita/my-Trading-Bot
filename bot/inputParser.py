@@ -1,5 +1,5 @@
 from sys import stderr
-from bot.candle import Candle
+from candle import Candle
 
 
 class InputParser:
