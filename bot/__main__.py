@@ -2,9 +2,12 @@
 
 from inputParser import InputParser
 from settings import Settings
+from bot import Bot
 
 
 def main():
+    bot = Bot()
+    bot.run()
     settings = Settings()
     candles_list = []
     p = InputParser(settings, candles_list)
