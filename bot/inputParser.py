@@ -4,17 +4,16 @@ from candle import Candle
 class InputParser:
     @staticmethod
     def parse_next_input():
-        i = 0
         line = input()
         if line.endswith('\n'):
             line = line[:-1]
-            parts = line.split(" ")
-            if parts[0] == "settings":
-                return [parts[0], parts[1], parts[2:]]
-            elif parts[0] == "update":
-                return [parts[0], parts[1], parts[2], parts[3]]
-            elif parts[0] == "action":
-                return [parts[0], parts[1], parts[2]]
+        parts = line.split(" ")
+        if parts[0] == "settings":
+            return [parts[0], parts[1], parts[2:]]
+        elif parts[0] == "update":
+            return [parts[0], parts[1], parts[2], parts[3]]
+        elif parts[0] == "action":
+            return [parts[0], parts[1], parts[2]]
 
     # return a list : the new amount of USDT, BTC, ETH. In that order.
     @staticmethod
@@ -23,12 +22,15 @@ class InputParser:
         new_stockpile_formmated = []
         for currency_stack in separated_stockpile:
             parts = currency_stack.split(':')
-            if parts[0] == "USDT" and len(new_stockpile_formmated) == 0:
-                new_stockpile_formmated.append(float(parts[1]))
-            elif parts[0] == "BTC" and len(new_stockpile_formmated) == 1:
-                new_stockpile_formmated.append(float(parts[1]))
-            elif parts[0] == "ETH" and len(new_stockpile_formmated) == 2:
-                new_stockpile_formmated.append(float(parts[1]))
+            if parts[0] == "USDT":
+                USDT_new_stack = float(parts[1])
+            elif parts[0] == "BTC":
+                BTC_new_stack = float(parts[1])
+            elif parts[0] == "ETH":
+                ETH_new_stack = float(parts[1])
+        new_stockpile_formmated.append(USDT_new_stack)
+        new_stockpile_formmated.append(BTC_new_stack)
+        new_stockpile_formmated.append(ETH_new_stack)
         return new_stockpile_formmated
 
     @staticmethod
