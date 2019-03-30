@@ -2,13 +2,8 @@ from candle import Candle
 
 
 class InputParser:
-    #def __init__(self, settings, candles_list):
- #   def __init__(self):
-#        pass
-        #self.settings = settings
-        #self.candles_list = candles_list
-
-    def parse_next_input(self):
+    @staticmethod
+    def parse_next_input():
         i = 0
         line = input()
         if line.endswith('\n'):
@@ -16,35 +11,10 @@ class InputParser:
             parts = line.split(" ")
             if parts[0] == "settings":
                 return [parts[0], parts[1], parts[2:]]
-                #self.set_setting(parts[1], parts[2:])
             elif parts[0] == "update":
                 return [parts[0], parts[1], parts[2], parts[3]]
-                #self.handle_update_type_input(parts[1], parts[2], parts[3])
             elif parts[0] == "action":
                 return [parts[0], parts[1], parts[2]]
-                i += 1
-                if i >= 10:
-                    print("pass")
-                else:
-                    if len(self.candles_list) == 0:
-                        print("pass")
-                        continue
-                    candle = self.select_last_candle("USDT_ETH")
-                    amount_i_want_to_sell = (self.settings.USDT_stockpile / 2) / candle.close
-                    print("buy USDT_ETH", amount_i_want_to_sell)
-
-    def select_last_candle(self, pair):
-        candles = self.candles_list[-1]
-        for candle in candles:
-            if candle.pair == pair:
-                return candle
-
-    def handle_update_type_input(self, player, update_type, value):
-        if player == "game":
-            if update_type == "next_candles":
-                self.parse_candles_value(value)
-            elif update_type == "stacks":
-                self.parse_new_stacks(value)
 
     # return a list : the new amount of USDT, BTC, ETH. In that order.
     @staticmethod

@@ -1,7 +1,7 @@
 from inputParser import InputParser
 from stockpile import Stockpile
 from botSettings import BotSettings
-from artificialIntelligence import ArtificialIntelligence
+from artificialIntelligence import  ArtificialIntelligence
 
 
 class Bot:
@@ -10,9 +10,7 @@ class Bot:
         self.stockpile = Stockpile()
         self.botSettings = BotSettings()
         self.list_of_three_candles = []
-        self.artificial_intelligence = ArtificialIntelligence()
-
-        self.tmp = 0
+        self.ai = ArtificialIntelligence()
 
     def run(self):
         while True:
@@ -32,16 +30,9 @@ class Bot:
                 elif stdin_input[2] == "stacks":
                     self.update_stockpile(stdin_input[3])
         elif stdin_input[0] == "action":
-            self.tmp += 1
-            if self.tmp >= 10:
-                print("pass")
-            else:
-                if len(self.list_of_three_candles) == 0:
-                    print("pass")
-                    return
-                candle = self.select_last_candle("USDT_ETH")
-                amount_i_want_to_sell = (self.settings.USDT_stockpile / 2) / candle.close
-                print("buy USDT_ETH", amount_i_want_to_sell)
+            action = self.ai.decide_action(self.list_of_three_candles,
+                                           self.stockpile)
+            print(action)
 
     def set_bot_settings(self, setting_type, value):
         if setting_type == "initial_stack":
