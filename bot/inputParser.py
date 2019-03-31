@@ -9,7 +9,7 @@ class InputParser:
             line = line[:-1]
         parts = line.split(" ")
         if parts[0] == "settings":
-            return [parts[0], parts[1], parts[2:]]
+            return [parts[0], parts[1], parts[2]]
         elif parts[0] == "update":
             return [parts[0], parts[1], parts[2], parts[3]]
         elif parts[0] == "action":
