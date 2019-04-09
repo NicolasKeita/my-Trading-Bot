@@ -9,12 +9,12 @@ class ArtificialIntelligence:
         else:
             if len(all_candles) == 0:
                 return "pass"
-            candle = self.select_last_candle(all_candles, "USDT_ETH")
+            candle = self.__select_last_candle(all_candles, "USDT_ETH")
             amount_i_want_to_sell = (current_stockpile.USDT / 2) / candle.close
             return "buy USDT_ETH " + str(amount_i_want_to_sell)
 
     @staticmethod
-    def select_last_candle(all_candles, pair):
+    def __select_last_candle(all_candles, pair):
         three_candles = all_candles[-1]
         for candle in three_candles:
             if candle.pair == pair:

@@ -3,17 +3,11 @@ from candle import Candle
 
 class InputParser:
     @staticmethod
-    def parse_next_input():
+    def get_input():
         line = input()
         if line.endswith('\n'):
             line = line[:-1]
-        parts = line.split(" ")
-        if parts[0] == "settings":
-            return [parts[0], parts[1], parts[2]]
-        elif parts[0] == "update":
-            return [parts[0], parts[1], parts[2], parts[3]]
-        elif parts[0] == "action":
-            return [parts[0], parts[1], parts[2]]
+        return line.split(" ")
 
     # return a list : the new amount of USDT, BTC, ETH. In that order.
     @staticmethod
