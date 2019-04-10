@@ -1,4 +1,4 @@
 class Analysis:
     @staticmethod
-    def MMA20():
+    def MMA(data_list):
         return 1

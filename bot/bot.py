@@ -2,6 +2,7 @@ from inputParser import InputParser
 from stockpile import Stockpile
 from botSettings import BotSettings
 from artificialIntelligence import ArtificialIntelligence
+from currencyEnum import CurrencyEnum
 
 
 class Bot:
@@ -43,8 +44,8 @@ class Bot:
     def __update_candle_list(self, input_candles):
         three_candles = self.input_parser.parse_three_candles(input_candles)
         self.all_candles.append(three_candles)
-        if len(self.all_candles) > 20:
-            self.all_candles.pop(0)
+        #if len(self.all_candles) > 20:
+        #    self.all_candles.pop(0)
 
     def __update_stockpile(self, input_new_stockpile):
         new_stockpile_formatted = \
@@ -52,4 +53,10 @@ class Bot:
         self.stockpile.USDT = new_stockpile_formatted[0]
         self.stockpile.BTC = new_stockpile_formatted[1]
         self.stockpile.ETH = new_stockpile_formatted[2]
+
+    def get_selected_candles(self, currency):
+        selected_candles = []
+        for three_candles in self.all_candles:
+            selected_candles.append(three_candles[currency])
+        return selected_candles
 
