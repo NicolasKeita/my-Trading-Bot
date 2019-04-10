@@ -1,7 +1,7 @@
 from inputParser import InputParser
 from stockpile import Stockpile
 from botSettings import BotSettings
-from artificialIntelligence import  ArtificialIntelligence
+from artificialIntelligence import ArtificialIntelligence
 
 
 class Bot:
