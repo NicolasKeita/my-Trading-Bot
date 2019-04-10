@@ -7,6 +7,8 @@ class InputParser:
         line = input()
         if line.endswith('\n'):
             line = line[:-1]
+        if line == "exit":
+            raise ExitProgram
         return line.split(" ")
 
     # return a list : the new amount of USDT, BTC, ETH. In that order.
@@ -46,3 +48,7 @@ class InputParser:
     @staticmethod
     def percent(nbr, percent):
         return nbr - nbr * percent / 100
+
+
+class ExitProgram(Exception):
+    pass

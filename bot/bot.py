@@ -1,4 +1,4 @@
-from inputParser import InputParser
+from inputParser import InputParser, ExitProgram
 from stockpile import Stockpile
 from botSettings import BotSettings
 from artificialIntelligence import ArtificialIntelligence
@@ -17,7 +17,7 @@ class Bot:
         while True:
             try:
                 stdin_input = self.input_parser.get_input()
-            except EOFError:
+            except (EOFError, ExitProgram):
                 return
             self.__handle_input(stdin_input)
 
@@ -59,4 +59,3 @@ class Bot:
         for three_candles in self.all_candles:
             selected_candles.append(three_candles[currency])
         return selected_candles
-
