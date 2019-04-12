@@ -1,8 +1,8 @@
-from inputParser import InputParser, ExitProgram
-from stockpile import Stockpile
-from botSettings import BotSettings
-from artificialIntelligence import ArtificialIntelligence
-from currencyEnum import CurrencyEnum
+from bot.inputParser import InputParser, ExitProgram
+from bot.stockpile import Stockpile
+from bot.botSettings import BotSettings
+from bot.artificialIntelligence import ArtificialIntelligence
+from bot.currencyEnum import CurrencyEnum
 
 
 class Bot:

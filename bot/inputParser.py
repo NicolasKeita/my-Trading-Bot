@@ -1,4 +1,4 @@
-from candle import Candle
+from bot.candle import Candle
 
 
 class InputParser:

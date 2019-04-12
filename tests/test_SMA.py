@@ -1,15 +1,15 @@
 #!/usr/bin/python3
 
 import unittest
-from analysis import Analysis
-from bot import Bot
-from currencyEnum import CurrencyEnum
+from bot.analysis import Analysis
+from bot.bot import Bot
+from bot.currencyEnum import CurrencyEnum
 from io import StringIO
 import sys
 import pandas as pd
 import numpy as np
 
-TEST_SMA_INPUT_FILE = "test_SMA_input.txt"
+TEST_SMA_INPUT_FILE = "tests/test_SMA_input.txt"
 
 
 class TestSMA(unittest.TestCase):
@@ -54,4 +54,6 @@ class TestSMA(unittest.TestCase):
 
 if __name__ == '__main__':
     unittest.main()
-
+else:
+    pass
+    #unittest.main()
