@@ -13,15 +13,8 @@ RM		=	rm -f
 
 NAME	=	trade
 
-SRC		=	bot/__main__.py
-
-LN		=	ln -s
-
-$(NAME)	:
-	$(LN) $(SRC) $(NAME)
-
-all	:	
-	$(MAKE) $(NAME) --no-print-directory
+all	:
+	cp trade.py $(NAME)
 
 tests_run :
 	python3 -m unittest discover tests/
