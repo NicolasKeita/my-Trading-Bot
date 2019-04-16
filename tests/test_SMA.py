@@ -54,6 +54,3 @@ class TestSMA(unittest.TestCase):
 
 if __name__ == '__main__':
     unittest.main()
-else:
-    pass
-    #unittest.main()
