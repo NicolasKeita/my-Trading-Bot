@@ -1,9 +1,13 @@
 from bot.analysis import Analysis
 import sys
+from bot.drawer import Drawer
+
+DEBUG_MODE = True
 
 
 class ArtificialIntelligence:
     def __init__(self):
+        self.drawer = Drawer()
         self.SMA_12_USDT_ETH = []
         self.SMA_26_USDT_ETH = []
         self.SMA_40_USDT_ETH = []
@@ -18,6 +22,7 @@ class ArtificialIntelligence:
         self.MACD_signal_USDT_ETH = []
         self.MACD_buy_indicator_USDT_ETH = False
         self.MACD_sell_indicator_USDT_ETH = False
+        self.tmp = 1
 
     def update_stats(self, all_candles):
         self.__update_SMA_arrays_and_EMA_arrays(all_candles)
@@ -25,6 +30,18 @@ class ArtificialIntelligence:
             self.__update_MACD_arrays(all_candles)
             if len(all_candles) > 26:
                 self.__update_MACD_indicators()
+        if self.tmp == 498 and DEBUG_MODE:
+            all_USDT_ETH_candles = self.__select_last_candles(all_candles, "USDT_ETH", -1)
+            closing_prices = self.__select_closing_prices(all_USDT_ETH_candles)
+            dates = self.__select_dates(all_USDT_ETH_candles)
+            print(len(self.MACD_USDT_ETH))
+            print(len(all_candles))
+            print(self.MACD_USDT_ETH)
+            self.drawer.draw(closing_prices, dates,
+                             self.EMA_12_USDT_ETH, self.EMA_26_USDT_ETH,
+                             self.MACD_USDT_ETH, self.MACD_signal_USDT_ETH)
+        print(self.tmp, file=sys.stderr)
+        self.tmp += 1
 
     def decide_action(self, all_candles, current_stockpile, bot_settings):
         if len(all_candles) == 0:
@@ -42,19 +59,20 @@ class ArtificialIntelligence:
     def __update_MACD_indicators(self):
         self.MACD_buy_indicator_USDT_ETH = False
         self.MACD_sell_indicator_USDT_ETH = False
-        if self.MACD_USDT_ETH[-2] < self.MACD_signal_USDT_ETH[-2] \
-                and self.MACD_USDT_ETH[-1] > self.MACD_signal_USDT_ETH[-1]:
-            self.MACD_buy_indicator_USDT_ETH = True
-        elif self.MACD_USDT_ETH[-2] > self.MACD_signal_USDT_ETH[-2] \
-                and self.MACD_USDT_ETH[-1] < self.MACD_signal_USDT_ETH[-1]:
-            self.MACD_sell_indicator_USDT_ETH = True
+        if len(self.MACD_USDT_ETH) >= 26 + 9:
+            if self.MACD_USDT_ETH[-2] < self.MACD_signal_USDT_ETH[-2] \
+                    and self.MACD_USDT_ETH[-1] > self.MACD_signal_USDT_ETH[-1]:
+                self.MACD_buy_indicator_USDT_ETH = True
+            elif self.MACD_USDT_ETH[-2] > self.MACD_signal_USDT_ETH[-2] \
+                    and self.MACD_USDT_ETH[-1] < self.MACD_signal_USDT_ETH[-1]:
+                self.MACD_sell_indicator_USDT_ETH = True
 
     def __update_MACD_arrays(self, all_candles):
-        self.MACD_USDT_ETH.append(abs(self.EMA_12_USDT_ETH[-1] - self.EMA_26_USDT_ETH[-1]))
-        if len(all_candles) == 26:
+        self.MACD_USDT_ETH.append(self.EMA_12_USDT_ETH[-1] - self.EMA_26_USDT_ETH[-1])
+        if len(all_candles) == 26 + 9:
             EMA_9 = Analysis.SMA(self.MACD_USDT_ETH[:-9])
             self.MACD_signal_USDT_ETH.append(EMA_9)
-        elif len(all_candles) > 26:
+        elif len(all_candles) > 26 + 9:
             EMA_9 = Analysis.EMA(self.MACD_USDT_ETH[-9:], self.MACD_signal_USDT_ETH[-1])
             self.MACD_signal_USDT_ETH.append(EMA_9)
 
@@ -111,7 +129,10 @@ class ArtificialIntelligence:
     @staticmethod
     def __select_last_candles(all_candles, pair, number_of_candles):
         last_candles = []
-        last_three_candles = all_candles[-number_of_candles:]
+        if number_of_candles == -1:
+            last_three_candles = all_candles
+        else:
+            last_three_candles = all_candles[-number_of_candles:]
         for three_candles in last_three_candles:
             for candle in three_candles:
                 if candle.pair == pair:
@@ -124,6 +145,13 @@ class ArtificialIntelligence:
         for candle in candles:
             closing_prices.append(candle.close)
         return closing_prices
+
+    @staticmethod
+    def __select_dates(candles):
+        dates = []
+        for candle in candles:
+            dates.append(candle.date)
+        return dates
 
     @staticmethod
     def __percent(nbr, percentage):
