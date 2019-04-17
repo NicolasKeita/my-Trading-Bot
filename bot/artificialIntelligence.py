@@ -1,36 +1,77 @@
 from bot.analysis import Analysis
 import sys
-from contextlib import suppress
 
 
 class ArtificialIntelligence:
     def __init__(self):
-        self.SMA_10_USDT_ETH = []
-        self.SMA_20_USDT_ETH = []
+        self.SMA_12_USDT_ETH = []
+        self.SMA_26_USDT_ETH = []
         self.SMA_40_USDT_ETH = []
         self.SMA_80_USDT_ETH = []
         self.SMA_160_USDT_ETH = []
-        self.EMA_10_USDT_ETH = []
-        self.EMA_20_USDT_ETH = []
+        self.EMA_12_USDT_ETH = []
+        self.EMA_26_USDT_ETH = []
         self.EMA_40_USDT_ETH = []
         self.EMA_80_USDT_ETH = []
         self.EMA_160_USDT_ETH = []
-        self.tmp = 0
+        self.MACD_USDT_ETH = []
+        self.MACD_signal_USDT_ETH = []
+        self.MACD_buy_indicator_USDT_ETH = False
+        self.MACD_sell_indicator_USDT_ETH = False
 
     def update_stats(self, all_candles):
+        self.__update_SMA_arrays_and_EMA_arrays(all_candles)
+        if len(all_candles) >= 26:
+            self.__update_MACD_arrays(all_candles)
+            if len(all_candles) > 26:
+                self.__update_MACD_indicators()
+
+    def decide_action(self, all_candles, current_stockpile, bot_settings):
+        if len(all_candles) == 0:
+            return "pass"
+        if self.MACD_buy_indicator_USDT_ETH == True:
+            price_one_eth = self.__select_last_candles(all_candles, "USDT_ETH", 1)[0].close
+            amount_i_want_to_buy = self.__percent(current_stockpile.USDT / price_one_eth,
+                                                  bot_settings.transaction_fee_percent)
+            return "buy USDT_ETH " + str(amount_i_want_to_buy)
+        elif self.MACD_sell_indicator_USDT_ETH == True:
+            amount_i_want_to_sell = current_stockpile.ETH
+            return "sell USDT_ETH " + str(amount_i_want_to_sell)
+        return "pass"
+
+    def __update_MACD_indicators(self):
+        self.MACD_buy_indicator_USDT_ETH = False
+        self.MACD_sell_indicator_USDT_ETH = False
+        if self.MACD_USDT_ETH[-2] < self.MACD_signal_USDT_ETH[-2] \
+                and self.MACD_USDT_ETH[-1] > self.MACD_signal_USDT_ETH[-1]:
+            self.MACD_buy_indicator_USDT_ETH = True
+        elif self.MACD_USDT_ETH[-2] > self.MACD_signal_USDT_ETH[-2] \
+                and self.MACD_USDT_ETH[-1] < self.MACD_signal_USDT_ETH[-1]:
+            self.MACD_sell_indicator_USDT_ETH = True
+
+    def __update_MACD_arrays(self, all_candles):
+        self.MACD_USDT_ETH.append(abs(self.EMA_12_USDT_ETH[-1] - self.EMA_26_USDT_ETH[-1]))
+        if len(all_candles) == 26:
+            EMA_9 = Analysis.SMA(self.MACD_USDT_ETH[:-9])
+            self.MACD_signal_USDT_ETH.append(EMA_9)
+        elif len(all_candles) > 26:
+            EMA_9 = Analysis.EMA(self.MACD_USDT_ETH[-9:], self.MACD_signal_USDT_ETH[-1])
+            self.MACD_signal_USDT_ETH.append(EMA_9)
+
+    def __update_SMA_arrays_and_EMA_arrays(self, all_candles):
         try:
-            if len(all_candles) <= 10:
-                SMA_10, EMA_10 = self.__update_SMA_EMA_first_time(all_candles, 10, "USDT_ETH")
+            if len(all_candles) <= 12:
+                SMA_12, EMA_12 = self.__update_SMA_EMA_first_time(all_candles, 12, "USDT_ETH")
             else:
-                SMA_10, EMA_10 = self.__update_SMA_EMA(all_candles, 10, "USDT_ETH", self.EMA_10_USDT_ETH[-1])
-            self.SMA_10_USDT_ETH.append(SMA_10)
-            self.EMA_10_USDT_ETH.append(EMA_10)
-            if len(all_candles) <= 20:
-                SMA_20, EMA_20 = self.__update_SMA_EMA_first_time(all_candles, 20, "USDT_ETH")
+                SMA_12, EMA_12 = self.__update_SMA_EMA(all_candles, 12, "USDT_ETH", self.EMA_12_USDT_ETH[-1])
+            self.SMA_12_USDT_ETH.append(SMA_12)
+            self.EMA_12_USDT_ETH.append(EMA_12)
+            if len(all_candles) <= 26:
+                SMA_26, EMA_26 = self.__update_SMA_EMA_first_time(all_candles, 26, "USDT_ETH")
             else:
-                SMA_20, EMA_20 = self.__update_SMA_EMA(all_candles, 20, "USDT_ETH", self.EMA_20_USDT_ETH[-1])
-            self.SMA_20_USDT_ETH.append(SMA_20)
-            self.EMA_20_USDT_ETH.append(EMA_20)
+                SMA_26, EMA_26 = self.__update_SMA_EMA(all_candles, 26, "USDT_ETH", self.EMA_26_USDT_ETH[-1])
+            self.SMA_26_USDT_ETH.append(SMA_26)
+            self.EMA_26_USDT_ETH.append(EMA_26)
             if len(all_candles) <= 40:
                 SMA_40, EMA_40 = self.__update_SMA_EMA_first_time(all_candles, 40, "USDT_ETH")
             else:
@@ -67,21 +108,10 @@ class ArtificialIntelligence:
             EMA = Analysis.EMA(self.__select_closing_prices(last_candles), previous_EMA)
             return SMA, EMA
 
-    def decide_action(self, all_candles, current_stockpile):
-        self.tmp += 1
-        if self.tmp >= 10:
-            return "pass"
-        else:
-            if len(all_candles) == 0:
-                return "pass"
-            candle = self.__select_last_candles(all_candles, "USDT_ETH", 1)[0]
-            amount_i_want_to_sell = (current_stockpile.USDT / 2) / candle.close
-            return "buy USDT_ETH " + str(amount_i_want_to_sell)
-
     @staticmethod
     def __select_last_candles(all_candles, pair, number_of_candles):
         last_candles = []
-        last_three_candles = all_candles[:-number_of_candles]
+        last_three_candles = all_candles[-number_of_candles:]
         for three_candles in last_three_candles:
             for candle in three_candles:
                 if candle.pair == pair:
@@ -94,6 +124,10 @@ class ArtificialIntelligence:
         for candle in candles:
             closing_prices.append(candle.close)
         return closing_prices
+
+    @staticmethod
+    def __percent(nbr, percentage):
+        return nbr * (1 - percentage / 100)
 
 
 class AverageComputationTooEarly(Exception):
