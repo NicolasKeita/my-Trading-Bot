@@ -11,6 +11,28 @@ class DataSet:
 
     def feed(self, all_candles):
         self.__feed_SMA_arrays_and_EMA_arrays(all_candles)
+        self.__feed_MACD_arrays(all_candles)
+        self.__feed_bollinger_arrays(all_candles)
+
+    def __feed_bollinger_arrays(self, all_candles):
+        if len(all_candles) < 20:
+            return
+        last_20_candles = Candle.select_last_candles(all_candles, "USDT_ETH", 20)
+        last_20_closing_prices = Candle.select_closing_prices(last_20_candles)
+        from numpy import std
+        self.USDT_ETH.standard_deviation.append(std(last_20_closing_prices))
+        upper_band = self.USDT_ETH.SMA_20[-1] + 2 * self.USDT_ETH.standard_deviation[-1]
+        lower_band = self.USDT_ETH.SMA_20[-1] - 2 * self.USDT_ETH.standard_deviation[-1]
+        self.USDT_ETH.BBW.append((upper_band - lower_band) / self.USDT_ETH.SMA_20[-1])
+        if len(all_candles) > 20:
+            self.__update_bollinger_band_indicator()
+
+    def __update_bollinger_band_indicator(self):
+        self.USDT_ETH.BB_indicator = False
+        if self.USDT_ETH.BBW[-2] < self.USDT_ETH.BBW[-1]:
+            self.USDT_ETH.BB_indicator = True
+
+    def __feed_MACD_arrays(self, all_candles):
         if len(all_candles) >= 26:
             self.__update_MACD_arrays(all_candles)
             if len(all_candles) > 26:
@@ -44,18 +66,18 @@ class DataSet:
                 SMA_12, EMA_12 = self.__update_SMA_EMA(all_candles, 12, "USDT_ETH", self.USDT_ETH.EMA_12[-1])
             self.USDT_ETH.SMA_12.append(SMA_12)
             self.USDT_ETH.EMA_12.append(EMA_12)
+            if len(all_candles) <= 20:
+                SMA_20, EMA_20 = self.__update_SMA_EMA_first_time(all_candles, 20, "USDT_ETH")
+            else:
+                SMA_20, EMA_20 = self.__update_SMA_EMA(all_candles, 20, "USDT_ETH", self.USDT_ETH.EMA_20[-1])
+            self.USDT_ETH.SMA_20.append(SMA_20)
+            self.USDT_ETH.EMA_20.append(EMA_20)
             if len(all_candles) <= 26:
                 SMA_26, EMA_26 = self.__update_SMA_EMA_first_time(all_candles, 26, "USDT_ETH")
             else:
                 SMA_26, EMA_26 = self.__update_SMA_EMA(all_candles, 26, "USDT_ETH", self.USDT_ETH.EMA_26[-1])
             self.USDT_ETH.SMA_26.append(SMA_26)
             self.USDT_ETH.EMA_26.append(EMA_26)
-            if len(all_candles) <= 40:
-                SMA_40, EMA_40 = self.__update_SMA_EMA_first_time(all_candles, 40, "USDT_ETH")
-            else:
-                SMA_40, EMA_40 = self.__update_SMA_EMA(all_candles, 40, "USDT_ETH", self.USDT_ETH.EMA_40[-1])
-            self.USDT_ETH.SMA_40.append(SMA_40)
-            self.USDT_ETH.EMA_40.append(EMA_40)
             if len(all_candles) <= 80:
                 SMA_80, EMA_80 = self.__update_SMA_EMA_first_time(all_candles, 80, "USDT_ETH")
             else:

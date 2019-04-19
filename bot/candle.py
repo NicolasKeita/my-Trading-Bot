@@ -22,15 +22,15 @@ class Candle:
         return last_candles
 
     @staticmethod
-    def select_closing_prices(candles):
+    def select_closing_prices(candle_list):
         closing_prices = []
-        for candle in candles:
+        for candle in candle_list:
             closing_prices.append(candle.close)
         return closing_prices
 
     @staticmethod
-    def select_dates(candles):
+    def select_dates(candle_list):
         dates = []
-        for candle in candles:
+        for candle in candle_list:
             dates.append(candle.date)
         return dates

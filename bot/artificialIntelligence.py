@@ -1,5 +1,3 @@
-from bot.analysis import Analysis
-import sys
 from bot.dataSet import DataSet
 from bot.drawer import Drawer
 from bot.candle import Candle
@@ -28,12 +26,12 @@ class ArtificialIntelligence:
     def decide_action(self, all_candles, current_stockpile, bot_settings):
         if len(all_candles) == 0:
             return "pass"
-        if self.__data.USDT_ETH.MACD_buy_indicator:
+        if self.__data.USDT_ETH.MACD_buy_indicator and self.__data.USDT_ETH.BB_indicator:
             price_one_eth = Candle.select_last_candles(all_candles, "USDT_ETH", 1)[0].close
             amount_i_want_to_buy = self.__percent(current_stockpile.USDT / price_one_eth,
                                                   bot_settings.transaction_fee_percent)
             return "buy USDT_ETH " + str(amount_i_want_to_buy)
-        elif self.__data.USDT_ETH.MACD_sell_indicator:
+        elif self.__data.USDT_ETH.MACD_sell_indicator and self.__data.USDT_ETH.BB_indicator and current_stockpile.ETH > 0:
             amount_i_want_to_sell = current_stockpile.ETH
             return "sell USDT_ETH " + str(amount_i_want_to_sell)
         return "pass"
@@ -42,6 +40,3 @@ class ArtificialIntelligence:
     def __percent(nbr, percentage):
         return nbr * (1 - percentage / 100)
 
-
-class AverageComputationTooEarly(Exception):
-    pass
