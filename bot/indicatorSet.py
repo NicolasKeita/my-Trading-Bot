@@ -29,9 +29,12 @@ class IndicatorSet:
         self.stochastic_D = []
         self.stochastic_buy_indicator = False
         self.stochastic_sell_indicator = False
+        self.RSI = []
+        self.RSI_buy_indicator = False
+        self.RSI_sell_indicator = False
 
 @unique
 class Trend(IntEnum):
-    UPWARD = 0
-    DOWNWARD = 1
-    CONSOLIDATION = 2
+    UPWARD = 1
+    DOWNWARD = 2
+    CONSOLIDATION = 3

@@ -3,6 +3,7 @@ from bot.analysis import Analysis
 from bot.candle import Candle
 import sys
 
+
 class DataSet:
     def __init__(self):
         self.USDT_ETH = IndicatorSet()
@@ -10,6 +11,10 @@ class DataSet:
         self.BTC_ETH = IndicatorSet()
         self.stochastics_buy_pre_indicator = False
         self.stochastics_sell_pre_indicator = False
+        self.RSI_previous_average_gain = 0.0
+        self.RSI_previous_average_loss = 0.0
+        self.RSI_buy_pre_indicator = False
+        self.RSI_sell_pre_indicator = False
 
     def feed(self, all_candles):
         self.__feed_SMA_arrays_and_EMA_arrays(all_candles)
@@ -17,6 +22,51 @@ class DataSet:
         self.__feed_MACD_arrays(all_candles)
         self.__feed_bollinger_arrays(all_candles)
         self.__feed_stochastics_arrays(all_candles)
+        self.__feed_RSI_arrays(all_candles)
+
+    def __feed_RSI_arrays(self, all_candles):
+        if len(all_candles) < 10:
+            return
+        last_10_candles = Candle.select_last_candles(all_candles, "USDT_ETH", 10)
+        last_10_closing_prices = Candle.select_closing_prices(last_10_candles)
+        if len(all_candles) == 10:
+            gains = 0
+            losses = 0
+            for x in range(1, 10):
+                delta = last_10_closing_prices[x] - last_10_closing_prices[x - 1]
+                if delta < 0:
+                    losses += abs(delta)
+                else:
+                    gains += delta
+            self.RSI_previous_average_gain = gains / 10
+            self.RSI_previous_average_loss = losses / 10
+        else:
+            delta = last_10_closing_prices[-1] - last_10_closing_prices[-2]
+            current_gain = 0
+            current_loss = 0
+            if delta < 0:
+                current_loss = abs(delta)
+            else:
+                current_gain = delta
+            self.RSI_previous_average_gain = (self.RSI_previous_average_gain * 9 + current_gain) / 10
+            self.RSI_previous_average_loss = (self.RSI_previous_average_loss * 9 + current_loss) / 10
+            RS = self.RSI_previous_average_gain / self.RSI_previous_average_loss
+            self.USDT_ETH.RSI.append(100 - 100 / (1 + RS))
+            self.__update_RSI_indicator()
+
+    def __update_RSI_indicator(self):
+        self.USDT_ETH.RSI_buy_indicator = False
+        self.USDT_ETH.RSI_sell_indicator = False
+        if self.USDT_ETH.RSI[-1] > 70:
+            self.RSI_sell_pre_indicator = True
+        elif self.USDT_ETH.RSI[-1] < 30:
+            self.RSI_buy_pre_indicator = True
+        if self.RSI_sell_pre_indicator is True and self.USDT_ETH.RSI[-1] < 70:
+            self.RSI_sell_pre_indicator = False
+            self.USDT_ETH.RSI_sell_indicator = True
+        elif self.RSI_buy_pre_indicator is True and self.USDT_ETH.RSI[-1] > 30:
+            self.RSI_buy_pre_indicator = False
+            self.USDT_ETH.RSI_buy_indicator = True
 
     def __define_trend(self, all_candles):
         if len(all_candles) < 85:

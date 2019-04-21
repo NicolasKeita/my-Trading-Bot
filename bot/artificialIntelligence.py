@@ -20,10 +20,12 @@ class ArtificialIntelligence:
         self.__tmp += 1
 
     def decide_action(self, all_candles, current_stockpile, bot_settings):
-        if len(all_candles) == 0:
+        if len(all_candles) < 20:
             return "pass"
         if current_stockpile.USDT > 0 \
-                and self.__data.USDT_ETH.stochastic_buy_indicator:
+                and (self.__data.USDT_ETH.stochastic_buy_indicator
+                     or ((self.__data.USDT_ETH.MACD_buy_indicator or self.__data.USDT_ETH.RSI_buy_indicator)
+                         and self.__data.USDT_ETH.trend == Trend.UPWARD)):
             price_one_eth = Candle.select_last_candles(all_candles, "USDT_ETH", 1)[0].close
             amount_i_want_to_buy = self.__percent(current_stockpile.USDT / price_one_eth,
                                                   bot_settings.transaction_fee_percent)
@@ -31,7 +33,9 @@ class ArtificialIntelligence:
                 self.__debug_print_which_indicator_triggered()
             return "buy USDT_ETH " + str(amount_i_want_to_buy)
         elif current_stockpile.ETH > 0 \
-                and self.__data.USDT_ETH.stochastic_sell_indicator:
+                and (self.__data.USDT_ETH.stochastic_sell_indicator
+                     or ((self.__data.USDT_ETH.MACD_sell_indicator or self.__data.USDT_ETH.RSI_sell_indicator)
+                         and self.__data.USDT_ETH.trend == Trend.DOWNWARD)):
             amount_i_want_to_sell = current_stockpile.ETH
             if DEBUG_TEXT_MODE:
                 self.__debug_print_which_indicator_triggered()
@@ -49,7 +53,7 @@ class ArtificialIntelligence:
         self.__drawer.draw(closing_prices, dates,
                            self.__data.USDT_ETH.EMA_12, self.__data.USDT_ETH.EMA_26,
                            self.__data.USDT_ETH.MACD, self.__data.USDT_ETH.MACD_signal,
-                           self.__data.USDT_ETH.stochastic_D)
+                           self.__data.USDT_ETH.stochastic_D, self.__data.USDT_ETH.RSI)
 
     def __debug_print_which_indicator_triggered(self):
         if self.__data.USDT_ETH.BB_indicator:
@@ -66,5 +70,9 @@ class ArtificialIntelligence:
             print("TREND UPWARD ", file=sys.stderr)
         if self.__data.USDT_ETH.trend == Trend.DOWNWARD:
             print("TREND DOWNWARD ", file=sys.stderr)
+        if self.__data.USDT_ETH.RSI_buy_indicator:
+            print("RSI buy indicator triggered", file=sys.stderr)
+        if self.__data.USDT_ETH.RSI_sell_indicator:
+            print("RSI sell indicator triggered", file=sys.stderr)
         print("", file=sys.stderr)
 
