@@ -1,6 +1,7 @@
 #!/usr/bin/python3
 
 from bot.bot import Bot
+import sys
 
 
 def main():

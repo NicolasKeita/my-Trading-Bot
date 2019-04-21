@@ -1,18 +1,58 @@
-from bot.indicatorSet import IndicatorSet
+from bot.indicatorSet import IndicatorSet, Trend
 from bot.analysis import Analysis
 from bot.candle import Candle
-
+import sys
 
 class DataSet:
     def __init__(self):
         self.USDT_ETH = IndicatorSet()
         self.USDT_BTC = IndicatorSet()
         self.BTC_ETH = IndicatorSet()
+        self.stochastics_buy_pre_indicator = False
+        self.stochastics_sell_pre_indicator = False
 
     def feed(self, all_candles):
         self.__feed_SMA_arrays_and_EMA_arrays(all_candles)
+        self.__define_trend(all_candles)
         self.__feed_MACD_arrays(all_candles)
         self.__feed_bollinger_arrays(all_candles)
+        self.__feed_stochastics_arrays(all_candles)
+
+    def __define_trend(self, all_candles):
+        if len(all_candles) < 85:
+            return
+        last_candle = Candle.select_last_candles(all_candles, "USDT_ETH", 1)[0]
+        if last_candle.close < self.USDT_ETH.EMA_85[-1]:
+            self.USDT_ETH.trend = Trend.DOWNWARD
+        else:
+            self.USDT_ETH.trend = Trend.UPWARD
+
+    def __feed_stochastics_arrays(self, all_candles):
+        if len(all_candles) < 14:
+            return
+        last_14_candles = Candle.select_last_candles(all_candles, "USDT_ETH", 14)
+        last_14_low = Candle.select_low(last_14_candles)
+        last_14_high = Candle.select_high(last_14_candles)
+        last_closing_price = Candle.select_closing_prices(last_14_candles)[0]
+        self.USDT_ETH.stochastic_K.append(100 * ((last_closing_price - min(last_14_low)) /
+                                                 (max(last_14_high) - min(last_14_low))))
+        if len(self.USDT_ETH.stochastic_K) >= 5:
+            self.USDT_ETH.stochastic_D.append(Analysis.SMA(self.USDT_ETH.stochastic_K[-5:]))
+            self.__update_stochastics_indicators()
+
+    def __update_stochastics_indicators(self):
+        self.USDT_ETH.stochastic_buy_indicator = False
+        self.USDT_ETH.stochastic_sell_indicator = False
+        if self.USDT_ETH.stochastic_D[-1] > 80:
+            self.stochastics_sell_pre_indicator = True
+        elif self.USDT_ETH.stochastic_D[-1] < 20:
+            self.stochastics_buy_pre_indicator = True
+        if self.stochastics_sell_pre_indicator is True and self.USDT_ETH.stochastic_D[-1] < 80:
+            self.stochastics_sell_pre_indicator = False
+            self.USDT_ETH.stochastic_sell_indicator = True
+        elif self.stochastics_buy_pre_indicator is True and self.USDT_ETH.stochastic_D[-1] > 20:
+            self.stochastics_buy_pre_indicator = False
+            self.USDT_ETH.stochastic_buy_indicator = True
 
     def __feed_bollinger_arrays(self, all_candles):
         if len(all_candles) < 20:
@@ -84,6 +124,18 @@ class DataSet:
                 SMA_80, EMA_80 = self.__update_SMA_EMA(all_candles, 80, "USDT_ETH", self.USDT_ETH.EMA_80[-1])
             self.USDT_ETH.SMA_80.append(SMA_80)
             self.USDT_ETH.EMA_80.append(EMA_80)
+            if len(all_candles) <= 85:
+                SMA_85, EMA_85 = self.__update_SMA_EMA_first_time(all_candles, 85, "USDT_ETH")
+            else:
+                SMA_85, EMA_85 = self.__update_SMA_EMA(all_candles, 85, "USDT_ETH", self.USDT_ETH.EMA_85[-1])
+            self.USDT_ETH.SMA_85.append(SMA_85)
+            self.USDT_ETH.EMA_85.append(EMA_85)
+            if len(all_candles) <= 90:
+                SMA_90, EMA_90 = self.__update_SMA_EMA_first_time(all_candles, 90, "USDT_ETH")
+            else:
+                SMA_90, EMA_90 = self.__update_SMA_EMA(all_candles, 90, "USDT_ETH", self.USDT_ETH.EMA_90[-1])
+            self.USDT_ETH.SMA_90.append(SMA_90)
+            self.USDT_ETH.EMA_90.append(EMA_90)
             if len(all_candles) <= 160:
                 SMA_160, EMA_160 = self.__update_SMA_EMA_first_time(all_candles, 160, "USDT_ETH")
             else:

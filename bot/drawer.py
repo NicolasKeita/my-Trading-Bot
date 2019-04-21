@@ -1,12 +1,13 @@
 import matplotlib.pyplot as plt
 import matplotlib.dates as dates
+import numpy as np
 import sys
 
 class Drawer:
     def __init__(self):
         pass
 
-    def draw(self, y, x, EMA_12, EMA_26, MACD, MACD_signal):
+    def draw(self, y, x, EMA_12, EMA_26, MACD, MACD_signal, stochastic_D):
         plt.title("USDT_ETH_charts")
         plt.xlabel("time")
         plt.ylabel("close_price")
@@ -18,6 +19,10 @@ class Drawer:
         plt.plot_date(date[25:], EMA_26, '-', label="EMA_26")
         plt.plot_date(date[25:], MACD, '-', label="MACD")
         plt.plot_date(date[25 + 9:], MACD_signal, '-', label="MACD_signal")
+        print(len(stochastic_D))
+        plt.plot_date(date[12 + 5:], [x + 600 for x in stochastic_D], '-', label="stochastic_D")
+        plt.plot_date(date, np.full((1, len(date)), 80 + 600)[0], '-', label="80")
+        plt.plot_date(date, np.full((1, len(date)), 20 + 600)[0], '-', label="20")
         plt.legend()
         plt.show()
         print("PLOT", file=sys.stderr)

@@ -34,3 +34,17 @@ class Candle:
         for candle in candle_list:
             dates.append(candle.date)
         return dates
+
+    @staticmethod
+    def select_high(candle_list):
+        high = []
+        for candle in candle_list:
+            high.append(candle.high)
+        return high
+
+    @staticmethod
+    def select_low(candle_list):
+        low = []
+        for candle in candle_list:
+            low.append(candle.low)
+        return low
