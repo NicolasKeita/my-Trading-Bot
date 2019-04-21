@@ -28,9 +28,9 @@ class DataSet:
             self.USDT_ETH.trend = Trend.UPWARD
 
     def __feed_stochastics_arrays(self, all_candles):
-        if len(all_candles) < 14:
+        if len(all_candles) < 14 * 24 * 2:
             return
-        last_14_candles = Candle.select_last_candles(all_candles, "USDT_ETH", 14)
+        last_14_candles = Candle.select_last_candles(all_candles, "USDT_ETH", 14 * 24 * 2)
         last_14_low = Candle.select_low(last_14_candles)
         last_14_high = Candle.select_high(last_14_candles)
         last_closing_price = Candle.select_closing_prices(last_14_candles)[0]

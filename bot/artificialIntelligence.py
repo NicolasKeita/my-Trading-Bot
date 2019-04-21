@@ -6,6 +6,7 @@ import sys
 DEBUG_TEXT_MODE = True
 DEBUG_PLOT_MODE = False
 
+
 class ArtificialIntelligence:
     def __init__(self):
         self.__drawer = Drawer()
