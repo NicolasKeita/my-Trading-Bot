@@ -15,27 +15,23 @@ class ArtificialIntelligence:
 
     def update_stats(self, all_candles):
         self.__data.feed(all_candles)
-        if self.__tmp == 310 and DEBUG_PLOT_MODE:
+        if self.__tmp == 319 and DEBUG_PLOT_MODE:
             self.__debug_plot_charts(all_candles)
         self.__tmp += 1
 
     def decide_action(self, all_candles, current_stockpile, bot_settings):
         if len(all_candles) == 0:
             return "pass"
-        if self.__data.USDT_ETH.trend == Trend.UPWARD \
-                and current_stockpile.USDT > 0 \
-                and (self.__data.USDT_ETH.MACD_buy_indicator
-                     or self.__data.USDT_ETH.stochastic_buy_indicator):
+        if current_stockpile.USDT > 0 \
+                and self.__data.USDT_ETH.stochastic_buy_indicator:
             price_one_eth = Candle.select_last_candles(all_candles, "USDT_ETH", 1)[0].close
             amount_i_want_to_buy = self.__percent(current_stockpile.USDT / price_one_eth,
                                                   bot_settings.transaction_fee_percent)
             if DEBUG_TEXT_MODE:
                 self.__debug_print_which_indicator_triggered()
             return "buy USDT_ETH " + str(amount_i_want_to_buy)
-        elif self.__data.USDT_ETH.trend == Trend.DOWNWARD \
-                and current_stockpile.ETH > 0 \
-                and (self.__data.USDT_ETH.MACD_sell_indicator
-                     or self.__data.USDT_ETH.stochastic_sell_indicator):
+        elif current_stockpile.ETH > 0 \
+                and self.__data.USDT_ETH.stochastic_sell_indicator:
             amount_i_want_to_sell = current_stockpile.ETH
             if DEBUG_TEXT_MODE:
                 self.__debug_print_which_indicator_triggered()

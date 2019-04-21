@@ -20,7 +20,7 @@ class Drawer:
         plt.plot_date(date[25:], MACD, '-', label="MACD")
         plt.plot_date(date[25 + 9:], MACD_signal, '-', label="MACD_signal")
         print(len(stochastic_D))
-        plt.plot_date(date[12 + 5:], [x + 600 for x in stochastic_D], '-', label="stochastic_D")
+        plt.plot_date(date[14 * 24 * 2 + 5:], [x + 600 for x in stochastic_D], '-', label="stochastic_D")
         plt.plot_date(date, np.full((1, len(date)), 80 + 600)[0], '-', label="80")
         plt.plot_date(date, np.full((1, len(date)), 20 + 600)[0], '-', label="20")
         plt.legend()
