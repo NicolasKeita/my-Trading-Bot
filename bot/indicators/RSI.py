@@ -12,20 +12,20 @@ class RSI:
         self.sell_indicator = False
 
     def feed(self, all_candles, last_10_candles):
-        if len(all_candles) < 10:
+        if len(all_candles) < 14:
             return
         last_10_closing_prices = Candle.select_closing_prices(last_10_candles)
-        if len(all_candles) == 10:
+        if len(all_candles) == 14:
             gains = 0
             losses = 0
-            for x in range(1, 10):
+            for x in range(1, 14):
                 delta = last_10_closing_prices[x] - last_10_closing_prices[x - 1]
                 if delta < 0:
                     losses += abs(delta)
                 else:
                     gains += delta
-            self.RSI_previous_average_gain = gains / 10
-            self.RSI_previous_average_loss = losses / 10
+            self.RSI_previous_average_gain = gains / 14
+            self.RSI_previous_average_loss = losses / 14
         else:
             delta = last_10_closing_prices[-1] - last_10_closing_prices[-2]
             current_gain = 0
@@ -34,8 +34,8 @@ class RSI:
                 current_loss = abs(delta)
             else:
                 current_gain = delta
-            self.RSI_previous_average_gain = (self.RSI_previous_average_gain * 9 + current_gain) / 10
-            self.RSI_previous_average_loss = (self.RSI_previous_average_loss * 9 + current_loss) / 10
+            self.RSI_previous_average_gain = (self.RSI_previous_average_gain * 13 + current_gain) / 14
+            self.RSI_previous_average_loss = (self.RSI_previous_average_loss * 13 + current_loss) / 14
             RS = self.RSI_previous_average_gain / self.RSI_previous_average_loss
             self.RSI.append(100 - 100 / (1 + RS))
             self.__update_RSI_indicator()

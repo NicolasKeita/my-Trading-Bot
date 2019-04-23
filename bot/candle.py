@@ -12,10 +12,10 @@ class Candle:
     def select_last_candles(all_candles, pair, number_of_candles):
         last_candles = []
         if number_of_candles == -1:
-            last_three_candles = all_candles
+            last_candles_selected = all_candles
         else:
-            last_three_candles = all_candles[-number_of_candles:]
-        for three_candles in last_three_candles:
+            last_candles_selected = all_candles[-number_of_candles:]
+        for three_candles in last_candles_selected:
             for candle in three_candles:
                 if candle.pair == pair:
                     last_candles.append(candle)

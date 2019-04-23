@@ -27,8 +27,8 @@ class ArtificialIntelligence:
             return "pass"
         if current_stockpile.USDT > 0 \
                 and (self.__USDT_ETH_indicators.stochastic.buy_indicator
-                     or ((self.__USDT_ETH_indicators.MACD.buy_indicator or self.__USDT_ETH_indicators.RSI.buy_indicator)
-                         and self.__USDT_ETH_indicators.trend == Trend.UPWARD)):
+                     or self.__USDT_ETH_indicators.MACD.buy_indicator
+                     or self.__USDT_ETH_indicators.RSI.buy_indicator):
             price_one_eth = Candle.select_last_candles(all_candles, "USDT_ETH", 1)[0].close
             amount_i_want_to_buy = self.__percent(current_stockpile.USDT / price_one_eth,
                                                   bot_settings.transaction_fee_percent)
@@ -37,8 +37,8 @@ class ArtificialIntelligence:
             return "buy USDT_ETH " + str(amount_i_want_to_buy)
         elif current_stockpile.ETH > 0 \
                 and (self.__USDT_ETH_indicators.stochastic.sell_indicator
-                     or ((self.__USDT_ETH_indicators.MACD.sell_indicator or self.__USDT_ETH_indicators.RSI.sell_indicator)
-                         and self.__USDT_ETH_indicators.trend == Trend.DOWNWARD)):
+                     or self.__USDT_ETH_indicators.MACD.sell_indicator
+                     or self.__USDT_ETH_indicators.RSI.sell_indicator):
             amount_i_want_to_sell = current_stockpile.ETH
             if DEBUG_TEXT_MODE:
                 self.__debug_print_which_indicator_triggered()
@@ -77,4 +77,5 @@ class ArtificialIntelligence:
             print("RSI buy indicator triggered", file=sys.stderr)
         if self.__USDT_ETH_indicators.RSI.sell_indicator:
             print("RSI sell indicator triggered", file=sys.stderr)
+        print("ADX strength : ", self.__USDT_ETH_indicators.ADX.ADX[-1], file=sys.stderr)
         print("", file=sys.stderr)

@@ -5,8 +5,8 @@ from bot.indicators.MACD import MACD
 from bot.indicators.bollingerBands import BollingerBands
 from bot.indicators.stochastic import Stochastic
 from bot.indicators.RSI import RSI
+from bot.indicators.ADX import ADX
 from bot.candle import Candle
-import sys
 
 
 class IndicatorSet:
@@ -19,46 +19,23 @@ class IndicatorSet:
         self.BB = BollingerBands()
         self.stochastic = Stochastic()
         self.RSI = RSI()
+        self.ADX = ADX()
         self.trend = Trend.CONSOLIDATION
-        '''
-        self.SMA_12 = []
-        self.SMA_20 = []
-        self.SMA_26 = []
-        self.SMA_80 = []
-        self.SMA_85 = []
-        self.SMA_90 = []
-        self.SMA_160 = []
-        self.EMA_12 = []
-        self.EMA_20 = []
-        self.EMA_26 = []
-        self.EMA_80 = []
-        self.EMA_85 = []
-        self.EMA_90 = []
-        self.EMA_160 = []
-        '''
-        #self.MACD = []
-        #self.MACD_signal = []
-        #self.MACD_buy_indicator = False
-        #self.MACD_sell_indicator = False
-        #self.BBW = []
-        #self.BB_indicator = False
-        #self.stochastic_K = []
-        #self.stochastic_D = []
-        #self.stochastic_buy_indicator = False
-        #self.stochastic_sell_indicator = False
-        #self.RSI = []
-        #self.RSI_buy_indicator = False
-        #self.RSI_sell_indicator = False
 
     def feed(self, all_candles):
         self.__feed_SMA_arrays_and_EMA_arrays(all_candles)
-        self.__define_trend(all_candles)
         self.MACD.feed(all_candles, self.EMA)
         self.__update_standard_deviation(all_candles)
-        if len(all_candles) >= 10:
-            last_10_candles = Candle.select_last_candles(all_candles, self.pair, 10)
-            self.stochastic.feed(all_candles, last_10_candles)
+        if len(all_candles) >= 14:
+            last_2_candles = Candle.select_last_candles(all_candles, self.pair, 2)
+            self.ADX.feed(last_2_candles)
+            self.__define_trend(all_candles)
+        if len(all_candles) >= 14:
+            last_10_candles = Candle.select_last_candles(all_candles, self.pair, 14)
             self.RSI.feed(all_candles, last_10_candles)
+        if len(all_candles) >= 14:
+            last_14_candles = Candle.select_last_candles(all_candles, self.pair, 14)
+            self.stochastic.feed(all_candles, last_14_candles)
         if len(self.standard_deviation) >= 1 and len(self.SMA.SMA_20) >= 1:
             self.BB.feed(all_candles, self.SMA.SMA_20[-1], self.standard_deviation[-1])
 
