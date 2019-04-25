@@ -67,6 +67,12 @@ class IndicatorSet:
                 SMA_26, EMA_26 = self.__update_SMA_EMA(all_candles, 26, self.EMA.EMA_26[-1])
             self.SMA.SMA_26.append(SMA_26)
             self.EMA.EMA_26.append(EMA_26)
+            if len(all_candles) <= 50:
+                SMA_50, EMA_50 = self.__update_SMA_EMA_first_time(all_candles, 50)
+            else:
+                SMA_50, EMA_50 = self.__update_SMA_EMA(all_candles, 50, self.EMA.EMA_50[-1])
+            self.SMA.SMA_50.append(SMA_50)
+            self.EMA.EMA_50.append(EMA_50)
             if len(all_candles) <= 80:
                 SMA_80, EMA_80 = self.__update_SMA_EMA_first_time(all_candles, 80)
             else:

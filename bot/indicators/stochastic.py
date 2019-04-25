@@ -11,14 +11,14 @@ class Stochastic:
         self.pre_buy_indicator = False
         self.pre_sell_indicator = False
 
-    def feed(self, all_candles, last_10_candles):
+    def feed(self, all_candles, last_14_candles):
         if len(all_candles) < 14:
             return
-        last_10_low = Candle.select_low(last_10_candles)
-        last_10_high = Candle.select_high(last_10_candles)
-        last_closing_price = last_10_candles[-1].close
-        self.stochastic_K.append(100 * ((last_closing_price - min(last_10_low)) /
-                                        (max(last_10_high) - min(last_10_low))))
+        last_14_low = Candle.select_low(last_14_candles)
+        last_14_high = Candle.select_high(last_14_candles)
+        last_closing_price = last_14_candles[-1].close
+        self.stochastic_K.append(100 * ((last_closing_price - min(last_14_low)) /
+                                        (max(last_14_high) - min(last_14_low))))
         if len(self.stochastic_K) >= 5:
             self.stochastic_D.append(SMA.SMA(self.stochastic_K[-5:]))
             self.__update_stochastics_indicators()

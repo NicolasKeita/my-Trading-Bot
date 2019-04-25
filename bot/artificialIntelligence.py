@@ -25,25 +25,43 @@ class ArtificialIntelligence:
     def decide_action(self, all_candles, current_stockpile, bot_settings):
         if len(all_candles) < 20:
             return "pass"
-        if current_stockpile.USDT > 0 \
-                and (self.__USDT_ETH_indicators.stochastic.buy_indicator
-                     or self.__USDT_ETH_indicators.MACD.buy_indicator
-                     or self.__USDT_ETH_indicators.RSI.buy_indicator):
+        if self.__buy_authorization(current_stockpile):
             price_one_eth = Candle.select_last_candles(all_candles, "USDT_ETH", 1)[0].close
             amount_i_want_to_buy = self.__percent(current_stockpile.USDT / price_one_eth,
                                                   bot_settings.transaction_fee_percent)
             if DEBUG_TEXT_MODE:
-                self.__debug_print_which_indicator_triggered()
+                self.__debug_print_which_indicator_triggered(all_candles, current_stockpile)
             return "buy USDT_ETH " + str(amount_i_want_to_buy)
-        elif current_stockpile.ETH > 0 \
-                and (self.__USDT_ETH_indicators.stochastic.sell_indicator
-                     or self.__USDT_ETH_indicators.MACD.sell_indicator
-                     or self.__USDT_ETH_indicators.RSI.sell_indicator):
+        elif self.__sell_authorization(current_stockpile):
             amount_i_want_to_sell = current_stockpile.ETH
             if DEBUG_TEXT_MODE:
-                self.__debug_print_which_indicator_triggered()
+                self.__debug_print_which_indicator_triggered(all_candles, current_stockpile)
             return "sell USDT_ETH " + str(amount_i_want_to_sell)
         return "pass"
+
+    def __buy_authorization(self, current_stockpile):
+        if current_stockpile.USDT < 3:
+            return False
+        if self.__USDT_ETH_indicators.ADX.buy_authorized is True \
+                and (self.__USDT_ETH_indicators.stochastic.buy_indicator
+                     or (self.__USDT_ETH_indicators.MACD.buy_indicator and self.__USDT_ETH_indicators.trend == Trend.UPWARD)
+                     or self.__USDT_ETH_indicators.RSI.buy_indicator
+                     or self.__USDT_ETH_indicators.ADX.buy_indicator and self.__USDT_ETH_indicators.trend == Trend.UPWARD and self.__USDT_ETH_indicators.ADX.trend_strength < 2):
+            return True
+        else:
+            return False
+
+    def __sell_authorization(self, current_stockpile):
+        if current_stockpile.ETH == 0:
+            return False
+        if self.__USDT_ETH_indicators.ADX.sell_authorized is True \
+                and (self.__USDT_ETH_indicators.stochastic.sell_indicator
+                     or (self.__USDT_ETH_indicators.MACD.sell_indicator and self.__USDT_ETH_indicators.trend == Trend.DOWNWARD)
+                     or self.__USDT_ETH_indicators.RSI.sell_indicator
+                     or self.__USDT_ETH_indicators.ADX.sell_indicator and self.__USDT_ETH_indicators.trend == Trend.DOWNWARD and self.__USDT_ETH_indicators.ADX.trend_strength < 2):
+            return True
+        else:
+            return False
 
     @staticmethod
     def __percent(nbr, percentage):
@@ -56,9 +74,10 @@ class ArtificialIntelligence:
         self.__drawer.draw(closing_prices, dates,
                            self.__USDT_ETH_indicators.EMA.EMA_12, self.__USDT_ETH_indicators.EMA.EMA_26,
                            self.__USDT_ETH_indicators.MACD.MACD, self.__USDT_ETH_indicators.MACD.MACD_signal,
-                           self.__USDT_ETH_indicators.stochastic.stochastic_D, self.__USDT_ETH_indicators.RSI.RSI)
+                           self.__USDT_ETH_indicators.stochastic.stochastic_D, self.__USDT_ETH_indicators.RSI.RSI,
+                           self.__USDT_ETH_indicators.ADX.ADX)
 
-    def __debug_print_which_indicator_triggered(self):
+    def __debug_print_which_indicator_triggered(self, all_candles, stockpile):
         if self.__USDT_ETH_indicators.BB.BB_indicator:
             print("BB indicator triggered", file=sys.stderr)
         if self.__USDT_ETH_indicators.stochastic.buy_indicator:
@@ -77,5 +96,15 @@ class ArtificialIntelligence:
             print("RSI buy indicator triggered", file=sys.stderr)
         if self.__USDT_ETH_indicators.RSI.sell_indicator:
             print("RSI sell indicator triggered", file=sys.stderr)
+        if self.__USDT_ETH_indicators.ADX.buy_indicator:
+            print("ADX buy indicator triggered", file=sys.stderr)
+        if self.__USDT_ETH_indicators.ADX.sell_indicator:
+            print("ADX sell indicator triggered", file=sys.stderr)
         print("ADX strength : ", self.__USDT_ETH_indicators.ADX.ADX[-1], file=sys.stderr)
+        print("DI+ strength : ", self.__USDT_ETH_indicators.ADX.DI_positive[-1], file=sys.stderr)
+        print("DI- strength : ", self.__USDT_ETH_indicators.ADX.DI_negative[-1], file=sys.stderr)
+        last_close = Candle.select_last_candles(all_candles, "USDT_ETH", 1)[-1].close
+        print("diff EMA_80 - close : ", last_close - self.__USDT_ETH_indicators.EMA.EMA_80[-1], file=sys.stderr)
+        print("diff EMA_50 - close : ", last_close - self.__USDT_ETH_indicators.SMA.SMA_50[-1], file=sys.stderr)
+        print("Current USDT = ", stockpile.USDT, file=sys.stderr)
         print("", file=sys.stderr)

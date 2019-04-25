@@ -3,6 +3,7 @@ class SMA:
         self.SMA_12 = []
         self.SMA_20 = []
         self.SMA_26 = []
+        self.SMA_50 = []
         self.SMA_80 = []
         self.SMA_85 = []
         self.SMA_90 = []

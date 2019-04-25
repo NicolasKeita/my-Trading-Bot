@@ -20,11 +20,9 @@ class MACD:
         if len(self.MACD) >= 26 + 9:
             if self.MACD[-2] < self.MACD_signal[-2] \
                     and self.MACD[-1] > self.MACD_signal[-1]:
-                return
                 self.buy_indicator = True
             elif self.MACD[-2] > self.MACD_signal[-2] \
                     and self.MACD[-1] < self.MACD_signal[-1]:
-                return
                 self.sell_indicator = True
 
     def __update_MACD_arrays(self, all_candles, EMA):

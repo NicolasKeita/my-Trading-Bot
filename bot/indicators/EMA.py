@@ -3,6 +3,7 @@ class EMA:
         self.EMA_12 = []
         self.EMA_20 = []
         self.EMA_26 = []
+        self.EMA_50 = []
         self.EMA_80 = []
         self.EMA_85 = []
         self.EMA_90 = []

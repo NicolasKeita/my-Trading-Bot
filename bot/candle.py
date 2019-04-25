@@ -1,11 +1,11 @@
 class Candle:
-    def __init__(self, pair):
+    def __init__(self, pair, high=0.0, low=0.0, close=0.0):
         self.pair = pair
         self.date = 0
-        self.high = 0.0
-        self.low = 0.0
+        self.high = high
+        self.low = low
         self.open = 0.0
-        self.close = 0.0
+        self.close = close
         self.volume = 0.0
 
     @staticmethod
