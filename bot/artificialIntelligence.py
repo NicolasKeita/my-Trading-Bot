@@ -87,7 +87,7 @@ class ArtificialIntelligence:
         if self.__buy_authorization(self.__BTC_ETH_indicators):
             if current_stockpile.BTC > 0:
                 price_one_eth = Candle.select_last_candles(all_candles, "BTC_ETH", 1)[0].close
-                amount_i_want_to_buy = self.__percent((current_stockpile.BTC / 2) / price_one_eth,
+                amount_i_want_to_buy = self.__percent((current_stockpile.BTC / 1) / price_one_eth,
                                                       bot_settings.transaction_fee_percent)
                 if DEBUG_TEXT_MODE:
                     msg = "buy BTC_ETH " + str(amount_i_want_to_buy)
@@ -128,9 +128,10 @@ class ArtificialIntelligence:
     def __buy_authorization(indicators):
         if indicators.ADX.buy_authorized is True:
             if (indicators.stochastic.buy_indicator
-                     or (indicators.MACD.buy_indicator and indicators.trend == Trend.UPWARD)
-                     or indicators.RSI.buy_indicator
-                     or indicators.ADX.buy_indicator and indicators.trend == Trend.UPWARD and indicators.ADX.trend_strength < 2):
+                    or indicators.BB.buy_indicator
+                    or (indicators.MACD.buy_indicator and indicators.trend == Trend.UPWARD)
+                    or indicators.RSI.buy_indicator
+                    or indicators.ADX.buy_indicator and indicators.trend == Trend.UPWARD and indicators.ADX.trend_strength < 2):
                 if indicators.stochastic.sell_indicator or indicators.RSI.sell_indicator:
                     if indicators.ADX.trend_strength > 5 and indicators.trend == Trend.DOWNWARD:
                         return False
@@ -141,6 +142,7 @@ class ArtificialIntelligence:
     def __sell_authorization(indicators):
         if indicators.ADX.sell_authorized is True:
             if (indicators.stochastic.sell_indicator
+                    or indicators.BB.buy_indicator
                     or (indicators.MACD.sell_indicator and indicators.trend == Trend.DOWNWARD)
                     or indicators.RSI.sell_indicator
                     or (indicators.ADX.sell_indicator and indicators.trend == Trend.DOWNWARD and indicators.ADX.trend_strength < 2)):
@@ -165,6 +167,10 @@ class ArtificialIntelligence:
                            self.__USDT_ETH_indicators.ADX.ADX)
 
     def __debug_print_which_indicator_triggered(self, all_candles, stockpile, indicators, msg):
+        if indicators.BB.buy_indicator:
+            print("BB_buy indicator triggered", file=sys.stderr)
+        if indicators.BB.sell_indicator:
+            print("BB_ sell _indicator_ triggered", file=sys.stderr)
         if indicators.BB.BB_indicator:
             print("BB indicator triggered", file=sys.stderr)
         if indicators.stochastic.buy_indicator:

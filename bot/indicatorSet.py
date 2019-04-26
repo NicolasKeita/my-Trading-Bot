@@ -37,7 +37,7 @@ class IndicatorSet:
             last_14_candles = Candle.select_last_candles(all_candles, self.pair, 14)
             self.stochastic.feed(all_candles, last_14_candles)
         if len(self.standard_deviation) >= 1 and len(self.SMA.SMA_20) >= 1:
-            self.BB.feed(all_candles, self.SMA.SMA_20[-1], self.standard_deviation[-1])
+            self.BB.feed(self.SMA.SMA_20[-1], self.standard_deviation[-1], last_2_candles[-1].close)
 
     def __update_standard_deviation(self, all_candles):
         if len(all_candles) < 20:
