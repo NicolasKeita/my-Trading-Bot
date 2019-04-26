@@ -7,6 +7,8 @@ class SMA:
         self.SMA_80 = []
         self.SMA_85 = []
         self.SMA_90 = []
+        self.SMA_95 = []
+        self.SMA_100 = []
         self.SMA_160 = []
 
     @staticmethod

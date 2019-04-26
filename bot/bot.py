@@ -30,11 +30,11 @@ class Bot:
                 elif stdin_input[2] == "stacks":
                     self.__update_stockpile(stdin_input[3])
         elif stdin_input[0] == "action":
-            #t = time()
             action = self.ai.decide_action(self.all_candles, self.stockpile,
                                            self.bot_settings)
-            #print((time() - t) * 1000, file=sys.stderr)
             print(action)
+            import sys
+            print(action, file=sys.stderr)
 
     def __set_bot_settings(self, setting_type, value):
         if setting_type == "initial_stack":

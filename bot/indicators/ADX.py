@@ -40,7 +40,7 @@ class ADX:
         self.__update_indicators()
 
     def __update_indicators(self):
-        if len(self.DI_positive) < 2:
+        if len(self.ADX) == 0:
             return
         self.buy_indicator = False
         self.sell_indicator = False
@@ -54,10 +54,9 @@ class ADX:
             return
         self.buy_authorized = True
         self.sell_authorized = True
-        if self.ADX[-1] < 12 or self.ADX[-1] > 30:
-            pass
-            #self.buy_authorized = False
-            #self.sell_authorized = False
+        if self.ADX[-1] < 25:
+            self.buy_authorized = False
+            self.sell_authorized = False
         if self.DI_positive[-1] > 26:
             self.sell_authorized = False
         if self.DI_negative[-1] > 26:
@@ -73,6 +72,12 @@ class ADX:
                 self.trend_strength = 2
             elif self.ADX[-1] < 35:
                 self.trend_strength = 3
+            elif self.ADX[-1] < 40:
+                self.trend_strength = 4
+            elif self.ADX[-1] < 45:
+                self.trend_strength = 5
+            elif self.ADX[-1] < 50:
+                self.trend_strength = 6
 
     def __update_trend(self):
         if len(self.DI_positive) == 0:

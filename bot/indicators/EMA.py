@@ -7,6 +7,8 @@ class EMA:
         self.EMA_80 = []
         self.EMA_85 = []
         self.EMA_90 = []
+        self.EMA_95 = []
+        self.EMA_100 = []
         self.EMA_160 = []
 
     @staticmethod

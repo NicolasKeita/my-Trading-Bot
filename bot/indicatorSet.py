@@ -91,6 +91,18 @@ class IndicatorSet:
                 SMA_90, EMA_90 = self.__update_SMA_EMA(all_candles, 90, self.EMA.EMA_90[-1])
             self.SMA.SMA_90.append(SMA_90)
             self.EMA.EMA_90.append(EMA_90)
+            if len(all_candles) <= 95:
+                SMA_95, EMA_95 = self.__update_SMA_EMA_first_time(all_candles, 95)
+            else:
+                SMA_95, EMA_95 = self.__update_SMA_EMA(all_candles, 95, self.EMA.EMA_95[-1])
+            self.SMA.SMA_95.append(SMA_95)
+            self.EMA.EMA_95.append(EMA_95)
+            if len(all_candles) <= 100:
+                SMA_100, EMA_100 = self.__update_SMA_EMA_first_time(all_candles, 100)
+            else:
+                SMA_100, EMA_100 = self.__update_SMA_EMA(all_candles, 100, self.EMA.EMA_100[-1])
+            self.SMA.SMA_100.append(SMA_100)
+            self.EMA.EMA_100.append(EMA_100)
             if len(all_candles) <= 160:
                 SMA_160, EMA_160 = self.__update_SMA_EMA_first_time(all_candles, 160)
             else:
@@ -116,10 +128,10 @@ class IndicatorSet:
             return SMA, EMA
 
     def __define_trend(self, all_candles):
-        if len(all_candles) < 85:
+        if len(all_candles) < 100:
             return
         last_candle = Candle.select_last_candles(all_candles, self.pair, 1)[0]
-        if last_candle.close < self.EMA.EMA_85[-1]:
+        if last_candle.close < self.EMA.EMA_100[-1]:
             self.trend = Trend.DOWNWARD
         else:
             self.trend = Trend.UPWARD
