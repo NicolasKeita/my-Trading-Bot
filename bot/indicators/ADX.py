@@ -68,9 +68,9 @@ class ADX:
                 self.trend_strength = 0
             elif self.ADX[-1] < 25:
                 self.trend_strength = 1
-            elif self.ADX[-1] < 30:
+            elif self.ADX[-1] < 33.3655:
                 self.trend_strength = 2
-            elif self.ADX[-1] < 35:
+            elif self.ADX[-1] < 35.689:
                 self.trend_strength = 3
             elif self.ADX[-1] < 40:
                 self.trend_strength = 4

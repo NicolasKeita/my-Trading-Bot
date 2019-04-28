@@ -135,9 +135,21 @@ class ArtificialIntelligence:
                 or (indicators.MACD.buy_indicator and indicators.BB.BB_indicator and not indicators.possible_overbought)
                 or (indicators.MACD.buy_indicator and indicators.BB.buy_indicator and indicators.BB.BB_indicator)
                 or indicators.ADX.buy_indicator and indicators.ADX.trend_strength < 2):
-            if indicators.stochastic.sell_indicator or indicators.RSI.sell_indicator:
+            if indicators.stochastic.buy_indicator or indicators.RSI.buy_indicator:
                 if indicators.ADX.trend_strength > 5 and indicators.trend == Trend.DOWNWARD:
                     return False
+                if indicators.ADX.trend_strength > 3 and indicators.trend == Trend.UPWARD and indicators.ADX.DI_negative[-1] > 26.1220:
+                    return False
+                if indicators.ADX.DI_negative[-1] > 29.649 and indicators.trend == Trend.UPWARD:
+                    return False
+                if indicators.ADX.trend_strength > 3 and indicators.trend == Trend.DOWNWARD and indicators.ADX.DI_positive[-1] < 8.8:
+                    return False
+                if indicators.ADX.trend_strength > 2 and indicators.trend == Trend.DOWNWARD and indicators.ADX.DI_positive[-1] < 12.71:
+                    return False
+                if indicators.ADX.trend_strength > 3 and indicators.trend == Trend.DOWNWARD and indicators.ADX.DI_negative[-1] > 35.96 and indicators.ADX.DI_positive[-1] < 14.08:
+                    return False
+            if (indicators.MACD.buy_indicator and indicators.ADX.trend_strength == 0):
+                return False
             return True
         return False
 
