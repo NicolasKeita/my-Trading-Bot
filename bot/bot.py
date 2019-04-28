@@ -33,8 +33,6 @@ class Bot:
             action = self.ai.decide_action(self.all_candles, self.stockpile,
                                            self.bot_settings)
             print(action)
-            import sys
-            print(action, file=sys.stderr)
 
     def __set_bot_settings(self, setting_type, value):
         if setting_type == "initial_stack":
@@ -45,8 +43,6 @@ class Bot:
     def __update_candle_list(self, input_candles):
         three_candles = self.input_parser.parse_three_candles(input_candles)
         self.all_candles.append(three_candles)
-#        if len(self.all_candles) > 160:
-#            self.all_candles.pop(0)
         self.ai.update_stats(self.all_candles)
 
     def __update_stockpile(self, input_new_stockpile):

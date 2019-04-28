@@ -1,6 +1,4 @@
 from bot.indicators.SMA import SMA
-from decimal import *
-import sys
 from enum import IntEnum, unique
 
 @unique
@@ -8,6 +6,7 @@ class Trend(IntEnum):
     UPWARD = 1
     DOWNWARD = 2
     CONSOLIDATION = 3
+
 
 class ADX:
     def __init__(self):
@@ -31,7 +30,6 @@ class ADX:
         self.sell_indicator = False
 
     def feed(self, last_2_candles):
-        getcontext().prec = 10
         self.__feed_ATR(last_2_candles[-1], last_2_candles[-2])
         self.__feed_ADX(last_2_candles[-1], last_2_candles[-2])
         self.__define_trend_strength()
@@ -66,7 +64,7 @@ class ADX:
         if len(self.ADX) > 0:
             if self.ADX[-1] < 13.637:
                 self.trend_strength = 0
-            elif self.ADX[-1] < 25:
+            elif self.ADX[-1] < 23.01:
                 self.trend_strength = 1
             elif self.ADX[-1] < 33.3655:
                 self.trend_strength = 2
@@ -111,13 +109,13 @@ class ADX:
                 self.ATR.append((14 - 1) / 14 * self.ATR[-1] + self.TR[-1])
 
     def __feed_ADX(self, current_candle, previous_candle):
-        DM_pos = Decimal(current_candle.high) - Decimal(previous_candle.high)
-        DM_neg = Decimal(previous_candle.low) - Decimal(current_candle.low)
+        DM_pos = current_candle.high - previous_candle.high
+        DM_neg = previous_candle.low - current_candle.low
         if DM_pos >= DM_neg:
-            self.DM_positive.append(float(DM_pos))
+            self.DM_positive.append(DM_pos)
             self.DM_negative.append(0)
         else:
-            self.DM_negative.append(float(DM_neg))
+            self.DM_negative.append(DM_neg)
             self.DM_positive.append(0)
         if len(self.DM_positive) >= 14:
             if len(self.DM_14_pos) == 0:

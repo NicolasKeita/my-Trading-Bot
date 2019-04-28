@@ -2,10 +2,9 @@ from bot.drawer import Drawer
 from bot.candle import Candle
 from bot.indicatorSet import IndicatorSet
 from bot.indicatorSet import Trend
-from time import time
 import sys
 
-DEBUG_TEXT_MODE = True
+DEBUG_TEXT_MODE = False
 DEBUG_PLOT_MODE = False
 
 
@@ -19,8 +18,8 @@ class ArtificialIntelligence:
 
     def update_stats(self, all_candles):
         self.__USDT_ETH_indicators.feed(all_candles)
-        self.__BTC_ETH_indicators.feed(all_candles)
-        self.__USDT_BTC_indicators.feed(all_candles)
+        #self.__BTC_ETH_indicators.feed(all_candles)
+        #self.__USDT_BTC_indicators.feed(all_candles)
         if self.__tmp == 319 and DEBUG_PLOT_MODE:
             self.__debug_plot_charts(all_candles)
         self.__tmp += 1
@@ -35,6 +34,7 @@ class ArtificialIntelligence:
         #BTC_ETH_action = self.__do_action_on_BTC_ETH(all_candles, current_stockpile, bot_settings, option)
         if BTC_ETH_action:
             option = 1
+        #if current_stockpile.USDT != 0:
         USDT_ETH_action = self.__do_action_on_USDT_ETH(all_candles, current_stockpile, bot_settings, option)
         if USDT_ETH_action:
             option = 1
@@ -147,6 +147,8 @@ class ArtificialIntelligence:
                     return False
             if (indicators.MACD.buy_indicator and indicators.ADX.trend_strength == 0):
                 return False
+            if indicators.SMA.SMA_160_diff > 48.458 and indicators.trend == Trend.UPWARD and indicators.ADX.trend_strength > 3 and indicators.ADX.DI_positive[-1] < 6.042:
+                return False
             return True
         return False
 
@@ -166,9 +168,23 @@ class ArtificialIntelligence:
                     return False
                 if indicators.ADX.DI_negative[-1] < 6.52 and indicators.ADX.trend_strength > 2 and indicators.trend == Trend.UPWARD:
                     return False
+                if indicators.ADX.buy_indicator and not indicators.BB.BB_indicator:
+                    return False
+                if indicators.SMA.SMA_160_diff > 46.7 and indicators.trend == Trend.UPWARD and indicators.ADX.ADX[-1] > 29.22 and indicators.ADX.DI_positive[-1] > 25.03 and indicators.ADX.DI_negative[-1] < 13:
+                    return False
             if indicators.MACD.sell_indicator:
+                if indicators.stochastic.stochastic_D[-1] < 44.1:
+                    return False
                 if indicators.ADX.trend_strength == 0:
                     return False
+            #if indicators.SMA.SMA_160_diff > 22.24 and indicators.trend == Trend.UPWARD and indicators.ADX.trend_strength < 2:
+                #return False
+            #if indicators.SMA.SMA_160_diff > 46.7 and indicators.trend == Trend.UPWARD and indicators.ADX.trend_strength >= 3:
+                #return False
+            #if indicators.SMA.SMA_160_diff > 72.94 and indicators.trend == Trend.UPWARD:
+                #return False
+            return True
+        if indicators.ADX.ADX[-1] > 31.46 and indicators.trend == Trend.DOWNWARD and indicators.SMA.SMA_160_diff > 28.98:
             return True
         return False
 
@@ -220,10 +236,9 @@ class ArtificialIntelligence:
         print("DI+ strength : ", indicators.ADX.DI_positive[-1], file=sys.stderr)
         print("DI- strength : ", indicators.ADX.DI_negative[-1], file=sys.stderr)
         print("current USDT =", stockpile.USDT, " current ETH = ", stockpile.ETH, "current BTC = ", stockpile.BTC, file=sys.stderr)
-        '''
-        last_close = Candle.select_last_candles(all_candles, "USDT_ETH", 1)[-1].close
+
+        last_close = Candle.select_last_candles(all_candles, "BTC_ETH", 1)[-1].close
+        print("diff EMA_160 - close : ", indicators.SMA.SMA_160_diff, file=sys.stderr)
         print("diff EMA_80 - close : ", last_close - indicators.EMA.EMA_80[-1], file=sys.stderr)
         print("diff EMA_50 - close : ", last_close - indicators.SMA.SMA_50[-1], file=sys.stderr)
-        print("Current USDT = ", stockpile.USDT, file=sys.stderr)
-        '''
         print("", file=sys.stderr)

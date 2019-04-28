@@ -28,7 +28,8 @@ class IndicatorSet:
         self.possible_oversold = False
 
     def feed(self, all_candles):
-        self.__feed_SMA_arrays_and_EMA_arrays(all_candles)
+        last_closing_price = Candle.select_last_candles(all_candles, self.pair, 1)[-1].close
+        self.__feed_SMA_arrays_and_EMA_arrays(all_candles, last_closing_price)
         self.MACD.feed(all_candles, self.EMA)
         self.__update_standard_deviation(all_candles)
         if len(all_candles) >= 14:
@@ -59,7 +60,8 @@ class IndicatorSet:
         if self.stochastic.oversold or self.RSI.oversold or self.stochastic.stochastic_D[-2] < 21 or self.stochastic.stochastic_D[-1] < 25 or self.RSI.RSI[-1] < 35:
             self.possible_oversold = True
         if self.stochastic.overbought or self.RSI.overbought or self.stochastic.stochastic_D[-2] > 80 or self.stochastic.stochastic_D[-1] > 75 or self.RSI.RSI[-1] > 65:
-            self.possible_overbought = True
+            if self.RSI.RSI[-1] > 40:
+                self.possible_overbought = True
 
     def __update_standard_deviation(self, all_candles):
         if len(all_candles) < 20:
@@ -69,7 +71,7 @@ class IndicatorSet:
         from numpy import std
         self.standard_deviation.append(std(last_20_closing_prices))
 
-    def __feed_SMA_arrays_and_EMA_arrays(self, all_candles):
+    def __feed_SMA_arrays_and_EMA_arrays(self, all_candles, last_closing_price):
         try:
             if len(all_candles) <= 12:
                 SMA_12, EMA_12 = self.__update_SMA_EMA_first_time(all_candles, 12)
@@ -131,6 +133,7 @@ class IndicatorSet:
                 SMA_160, EMA_160 = self.__update_SMA_EMA(all_candles, 160, self.EMA.EMA_160[-1])
             self.SMA.SMA_160.append(SMA_160)
             self.EMA.EMA_160.append(EMA_160)
+            self.SMA.update_SMA_160_diff(last_closing_price)
         except AverageComputationTooEarly:
             pass
 
