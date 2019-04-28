@@ -68,8 +68,7 @@ class ArtificialIntelligence:
     def __do_action_on_USDT_ETH(self, all_candles, current_stockpile, bot_settings, option):
         if self.__buy_authorization(self.__USDT_ETH_indicators) and current_stockpile.USDT > 3:
             price_one_eth = Candle.select_last_candles(all_candles, "USDT_ETH", 1)[0].close
-            amount_i_want_to_buy = self.__percent((current_stockpile.USDT / 1) / price_one_eth,
-                                                  bot_settings.transaction_fee_percent)
+            amount_i_want_to_buy = current_stockpile.USDT / price_one_eth
             if option:
                 return 0
             if DEBUG_TEXT_MODE:
@@ -90,8 +89,7 @@ class ArtificialIntelligence:
         if self.__buy_authorization(self.__BTC_ETH_indicators):
             if current_stockpile.BTC > 0:
                 price_one_eth = Candle.select_last_candles(all_candles, "BTC_ETH", 1)[0].close
-                amount_i_want_to_buy = self.__percent((current_stockpile.BTC / 1) / price_one_eth,
-                                                      bot_settings.transaction_fee_percent)
+                amount_i_want_to_buy = current_stockpile.BTC / price_one_eth
                 if DEBUG_TEXT_MODE:
                     msg = "buy BTC_ETH " + str(amount_i_want_to_buy)
                     self.__debug_print_which_indicator_triggered(all_candles, current_stockpile, self.__BTC_ETH_indicators, msg)
@@ -109,8 +107,7 @@ class ArtificialIntelligence:
     def __do_action_on_USDT_BTC(self, all_candles, current_stockpile, bot_settings, option):
         if self.__buy_authorization(self.__USDT_BTC_indicators) and current_stockpile.USDT > 3:
             price_one_btc = Candle.select_last_candles(all_candles, "USDT_BTC", 1)[0].close
-            amount_i_want_to_buy = self.__percent((current_stockpile.USDT / 1) / price_one_btc,
-                                                  bot_settings.transaction_fee_percent)
+            amount_i_want_to_buy = current_stockpile.USDT / price_one_btc
             if option:
                 return 0
             if DEBUG_TEXT_MODE:
@@ -157,7 +154,7 @@ class ArtificialIntelligence:
     def __sell_authorization(indicators):
         #if indicators.ADX.sell_authorized is True:
         if (indicators.overbought
-                or (indicators.BB.sell_indicator and indicators.BB.BB_indicator and not indicators.possible_oversold)
+                or (indicators.BB.sell_indicator and indicators.BB.BB_indicator and not indicators.possible_oversold and not indicators.ADX.buy_indicator)
                 or (indicators.MACD.sell_indicator and indicators.BB.BB_indicator and not indicators.possible_oversold)
                 or (indicators.ADX.sell_indicator and indicators.ADX.trend_strength < 2)):
             if indicators.stochastic.sell_indicator or indicators.RSI.sell_indicator:
@@ -166,6 +163,8 @@ class ArtificialIntelligence:
                 if (indicators.MACD.buy_indicator and indicators.BB.buy_indicator):
                     return False
                 if indicators.ADX.DI_positive[-1] > 31.148:
+                    return False
+                if indicators.ADX.DI_negative[-1] < 6.52 and indicators.ADX.trend_strength > 2 and indicators.trend == Trend.UPWARD:
                     return False
             if indicators.MACD.sell_indicator:
                 if indicators.ADX.trend_strength == 0:
@@ -220,6 +219,7 @@ class ArtificialIntelligence:
         print("ADX strength : ", indicators.ADX.ADX[-1], file=sys.stderr)
         print("DI+ strength : ", indicators.ADX.DI_positive[-1], file=sys.stderr)
         print("DI- strength : ", indicators.ADX.DI_negative[-1], file=sys.stderr)
+        print("current USDT =", stockpile.USDT, " current ETH = ", stockpile.ETH, "current BTC = ", stockpile.BTC, file=sys.stderr)
         '''
         last_close = Candle.select_last_candles(all_candles, "USDT_ETH", 1)[-1].close
         print("diff EMA_80 - close : ", last_close - indicators.EMA.EMA_80[-1], file=sys.stderr)
