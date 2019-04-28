@@ -7,6 +7,7 @@ from bot.indicators.stochastic import Stochastic
 from bot.indicators.RSI import RSI
 from bot.indicators.ADX import ADX
 from bot.candle import Candle
+import sys
 
 
 class IndicatorSet:
@@ -21,6 +22,10 @@ class IndicatorSet:
         self.RSI = RSI()
         self.ADX = ADX()
         self.trend = Trend.CONSOLIDATION
+        self.overbought = False
+        self.oversold = False
+        self.possible_overbought = False
+        self.possible_oversold = False
 
     def feed(self, all_candles):
         self.__feed_SMA_arrays_and_EMA_arrays(all_candles)
@@ -30,14 +35,31 @@ class IndicatorSet:
             last_2_candles = Candle.select_last_candles(all_candles, self.pair, 2)
             self.ADX.feed(last_2_candles)
             self.__define_trend(all_candles)
-        if len(all_candles) >= 14:
-            last_10_candles = Candle.select_last_candles(all_candles, self.pair, 14)
-            self.RSI.feed(all_candles, last_10_candles)
-        if len(all_candles) >= 14:
             last_14_candles = Candle.select_last_candles(all_candles, self.pair, 14)
-            self.stochastic.feed(all_candles, last_14_candles)
+            self.RSI.feed(all_candles, last_14_candles)
+            self.stochastic.feed(last_14_candles)
+            self.__update_oversold_overbought_indicators()
         if len(self.standard_deviation) >= 1 and len(self.SMA.SMA_20) >= 1:
+            last_2_candles = Candle.select_last_candles(all_candles, self.pair, 2)
             self.BB.feed(self.SMA.SMA_20[-1], self.standard_deviation[-1], last_2_candles[-1].close)
+
+    def __update_oversold_overbought_indicators(self):
+        self.oversold = False
+        self.overbought = False
+        self.possible_overbought = False
+        self.possible_oversold = False
+        if len(self.stochastic.stochastic_D) < 3:
+            return
+        if ((self.stochastic.buy_indicator and self.RSI.RSI[-2] < 42 and self.RSI.RSI[-2] > 18)
+                or (self.RSI.buy_indicator and self.stochastic.stochastic_D[-2] < 32 and self.stochastic.stochastic_D[-2] > 8)):
+            self.oversold = True
+        if ((self.stochastic.sell_indicator and self.RSI.RSI[-2] < 82 and self.RSI.RSI[-2] > 59 and self.RSI.RSI[-2] > self.RSI.RSI[-1])
+                or (self.RSI.sell_indicator and self.stochastic.stochastic_D[-2] < 92 and self.stochastic.stochastic_D[-2] > 68)):
+            self.overbought = True
+        if self.stochastic.oversold or self.RSI.oversold or self.stochastic.stochastic_D[-2] < 21 or self.stochastic.stochastic_D[-1] < 25 or self.RSI.RSI[-1] < 35:
+            self.possible_oversold = True
+        if self.stochastic.overbought or self.RSI.overbought or self.stochastic.stochastic_D[-2] > 80 or self.stochastic.stochastic_D[-1] > 75 or self.RSI.RSI[-1] > 65:
+            self.possible_overbought = True
 
     def __update_standard_deviation(self, all_candles):
         if len(all_candles) < 20:

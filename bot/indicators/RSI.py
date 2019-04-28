@@ -5,21 +5,23 @@ class RSI:
     def __init__(self):
         self.RSI_previous_average_gain = 0.0
         self.RSI_previous_average_loss = 0.0
-        self.pre_buy_indicator = False
-        self.pre_sell_indicator = False
+        self.oversold = False
+        self.overbought = False
         self.RSI = []
         self.buy_indicator = False
         self.sell_indicator = False
+        self.overbought = False
+        self.oversold = False
 
-    def feed(self, all_candles, last_10_candles):
+    def feed(self, all_candles, last_14_candles):
         if len(all_candles) < 14:
             return
-        last_10_closing_prices = Candle.select_closing_prices(last_10_candles)
+        last_14_closing_prices = Candle.select_closing_prices(last_14_candles)
         if len(all_candles) == 14:
             gains = 0
             losses = 0
             for x in range(1, 14):
-                delta = last_10_closing_prices[x] - last_10_closing_prices[x - 1]
+                delta = last_14_closing_prices[x] - last_14_closing_prices[x - 1]
                 if delta < 0:
                     losses += abs(delta)
                 else:
@@ -27,7 +29,7 @@ class RSI:
             self.RSI_previous_average_gain = gains / 14
             self.RSI_previous_average_loss = losses / 14
         else:
-            delta = last_10_closing_prices[-1] - last_10_closing_prices[-2]
+            delta = last_14_closing_prices[-1] - last_14_closing_prices[-2]
             current_gain = 0
             current_loss = 0
             if delta < 0:
@@ -44,12 +46,12 @@ class RSI:
         self.buy_indicator = False
         self.sell_indicator = False
         if self.RSI[-1] > 70:
-            self.pre_sell_indicator = True
+            self.overbought = True
         elif self.RSI[-1] < 30:
-            self.pre_buy_indicator = True
-        if self.pre_sell_indicator is True and self.RSI[-1] < 70:
-            self.pre_sell_indicator = False
+            self.oversold = True
+        if self.overbought is True and self.RSI[-1] < 71:
+            self.overbought = False
             self.sell_indicator = True
-        elif self.pre_buy_indicator is True and self.RSI[-1] > 30:
-            self.pre_buy_indicator = False
+        elif self.oversold is True and self.RSI[-1] > 30:
+            self.oversold = False
             self.buy_indicator = True

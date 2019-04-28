@@ -64,7 +64,7 @@ class ADX:
 
     def __define_trend_strength(self):
         if len(self.ADX) > 0:
-            if self.ADX[-1] < 20:
+            if self.ADX[-1] < 13.637:
                 self.trend_strength = 0
             elif self.ADX[-1] < 25:
                 self.trend_strength = 1
