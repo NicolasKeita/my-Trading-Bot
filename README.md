@@ -14,5 +14,12 @@ Output		: "buy" or "sell" or "pass"
 Output example  : "buy USDT_ETH 0.01"
 </pre>
 
+
 The engine sending inputs and receiving outputs is provided by riddles.io's platform
 https://playground.riddles.io/competitions/crypto-trader
+
+TEST THE BOT :
+
+There is a gui program able to test the bot in the directory "ai-bot-workspace".
+Change the program's settings to mine :
+![Settings](https://ibb.co/k3YxPR6)
