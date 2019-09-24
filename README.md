@@ -22,4 +22,4 @@ TEST THE BOT :
 
 There is a gui program able to test the bot in the directory "ai-bot-workspace".
 Change the program's settings to mine :
-![Settings](https://ibb.co/k3YxPR6)
+![Settings](https://raw.githubusercontent.com/NicolasKeita/my-Trading-Bot/master/assets/crypto_tuto_1.png)
