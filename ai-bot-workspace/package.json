@@ -1,0 +1,40 @@
+{
+  "name": "ai-bot-workspace",
+  "productName": "AI Bot Workspace",
+  "version": "2.4.3",
+  "description": "An Electron application which includes testing workspaces for most Riddles.io competitions.",
+  "main": "src/app.js",
+  "repository": "https://github.com/jmerle/ai-bot-workspace",
+  "author": "Jasper van Merle <jaspervmerle@gmail.com>",
+  "license": "MIT",
+  "private": true,
+  "scripts": {
+    "start": "electron .",
+    "pack": "electron-builder --dir",
+    "dist": "electron-builder",
+    "release": "electron-builder",
+    "postinstall": "electron-builder install-app-deps"
+  },
+  "build": {
+    "appId": "com.jaspervanmerle.aibotworkspace",
+    "asarUnpack": "**/*.jar",
+    "mac": {
+      "category": "public.app-category.developer-tools"
+    },
+    "linux": {
+      "target": "AppImage",
+      "category": "Development"
+    }
+  },
+  "dependencies": {
+    "electron-store": "^1.3.0",
+    "electron-updater": "^2.20.1",
+    "execa": "^0.9.0",
+    "marked": "^0.3.17",
+    "semver": "^5.5.0"
+  },
+  "devDependencies": {
+    "electron": "1.8.4",
+    "electron-builder": "^20.2.0"
+  }
+}
