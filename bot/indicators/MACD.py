@@ -8,10 +8,10 @@ class MACD:
         self.buy_indicator = False
         self.sell_indicator = False
 
-    def feed(self, all_candles, EMA):
-        if len(all_candles) >= 26:
-            self.__update_MACD_arrays(all_candles, EMA)
-            if len(all_candles) > 26:
+    def feed(self, number_of_candles, EMA):
+        if number_of_candles >= 26:
+            self.__update_MACD_arrays(number_of_candles, EMA)
+            if number_of_candles > 26:
                 self.__update_indicators()
 
     def __update_indicators(self):
@@ -25,11 +25,11 @@ class MACD:
                     and self.MACD[-1] < self.MACD_signal[-1]:
                 self.sell_indicator = True
 
-    def __update_MACD_arrays(self, all_candles, EMA):
+    def __update_MACD_arrays(self, number_of_candles, EMA):
         self.MACD.append(EMA.EMA_12[-1] - EMA.EMA_26[-1])
-        if len(all_candles) == 26 + 9:
+        if number_of_candles == 26 + 9:
             EMA_9 = SMA.SMA(self.MACD[:-9])
             self.MACD_signal.append(EMA_9)
-        elif len(all_candles) > 26 + 9:
+        elif number_of_candles > 26 + 9:
             EMA_9 = EMA.EMA(self.MACD[-9:], self.MACD_signal[-1])
             self.MACD_signal.append(EMA_9)

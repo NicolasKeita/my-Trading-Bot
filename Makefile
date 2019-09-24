@@ -14,7 +14,7 @@ RM		=	rm -f
 NAME	=	trade
 
 all	:
-	cp trade.py $(NAME)
+	ln -s __main__.py $(NAME)
 
 tests_run :
 	python3 -m unittest discover tests/

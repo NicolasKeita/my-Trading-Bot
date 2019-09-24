@@ -16,7 +16,8 @@ class Bot:
         while True:
             try:
                 stdin_input = self.input_parser.get_input()
-            except (EOFError, ExitProgram):
+
+            except (EOFError, ExitProgram, KeyboardInterrupt):
                 return
             self.__handle_input(stdin_input)
 

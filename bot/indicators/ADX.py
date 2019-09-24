@@ -1,6 +1,7 @@
 from bot.indicators.SMA import SMA
 from enum import IntEnum, unique
 
+
 @unique
 class Trend(IntEnum):
     UPWARD = 1
