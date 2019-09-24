@@ -21,5 +21,6 @@ https://playground.riddles.io/competitions/crypto-trader
 TEST THE BOT :
 
 There is a gui program able to test the bot in the directory "ai-bot-workspace".
+
 Change the program's settings to mine :
 ![Settings](assets/crypto_tuto_1.png)
